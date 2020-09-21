@@ -1,3 +1,5 @@
+Maintaining separate version with Qt 5.9.9 support for legacy systems
+
 ![GitQLient logo](https://github.com/francescmm/GitQlient/blob/master/src/resources/icons/GitQlientLogo96.png "GitQlient")
 
 # GitQlient: Multi-platform Git client written with Qt
