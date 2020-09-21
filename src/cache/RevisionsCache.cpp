@@ -77,11 +77,11 @@ void RevisionsCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArra
 void RevisionsCache::setupGitPlatform(const QSharedPointer<IRestApi> &api)
 {
    if (mApi)
-      disconnect(mApi.get(), &IRestApi::pullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
+      disconnect(mApi.data(), &IRestApi::pullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
 
    mApi = api;
 
-   connect(mApi.get(), &IRestApi::pullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
+   connect(mApi.data(), &IRestApi::pullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
 }
 
 CommitInfo RevisionsCache::getCommitInfoByRow(int row)

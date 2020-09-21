@@ -34,7 +34,7 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache
    connect(header(), &QHeaderView::customContextMenuRequested, this, &CommitHistoryView::onHeaderContextMenu);
    connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
 
-   connect(mCache.get(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryView::refreshView);
+   connect(mCache.data(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryView::refreshView);
 
    connect(this, &CommitHistoryView::doubleClicked, this, [this](const QModelIndex &index) {
       if (mCommitHistoryModel)
@@ -213,7 +213,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
       if (!shas.isEmpty())
       {
          const auto menu = new CommitHistoryContextMenu(mCache, mGit, shas, this);
-         connect(menu, &CommitHistoryContextMenu::signalRefreshPRsCache, mCache.get(),
+         connect(menu, &CommitHistoryContextMenu::signalRefreshPRsCache, mCache.data(),
                  &RevisionsCache::refreshPRsCache);
          connect(menu, &CommitHistoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);

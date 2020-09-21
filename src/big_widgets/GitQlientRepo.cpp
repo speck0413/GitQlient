@@ -63,8 +63,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
       mAutoPrUpdater = new QTimer();
       mAutoPrUpdater->start(300 * 1000);
 
-      connect(mAutoPrUpdater, &QTimer::timeout, mGitQlientCache.get(), &RevisionsCache::refreshPRsCache);
-      connect(mControls, &Controls::signalRefreshPRsCache, mGitQlientCache.get(), &RevisionsCache::refreshPRsCache);
+      connect(mAutoPrUpdater, &QTimer::timeout, mGitQlientCache.data(), &RevisionsCache::refreshPRsCache);
+      connect(mControls, &Controls::signalRefreshPRsCache, mGitQlientCache.data(), &RevisionsCache::refreshPRsCache);
 
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();

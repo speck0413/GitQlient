@@ -254,27 +254,29 @@ void GitHubRestApi::processPullRequets()
 
       for (const auto &pr : prs)
       {
-         prInfo.id = pr["number"].toInt();
-         prInfo.title = pr["title"].toString();
-         prInfo.body = pr["body"].toString().toUtf8();
-         prInfo.head = pr["head"].toObject()["ref"].toString();
-         prInfo.base = pr["base"].toObject()["ref"].toString();
-         prInfo.isOpen = pr["state"].toString() == "open";
-         prInfo.draft = pr["draft"].toBool();
-         // prInfo.details;
-         prInfo.url = pr["html_url"].toString();
+          if(pr.isObject()) {
+            prInfo.id = pr.toObject()["number"].toInt();
+            prInfo.title = pr.toObject()["title"].toString();
+            prInfo.body = pr.toObject()["body"].toString().toUtf8();
+            prInfo.head = pr.toObject()["head"].toObject()["ref"].toString();
+            prInfo.base = pr.toObject()["base"].toObject()["ref"].toString();
+            prInfo.isOpen = pr.toObject()["state"].toString() == "open";
+            prInfo.draft = pr.toObject()["draft"].toBool();
+            // prInfo.details;
+            prInfo.url = pr.toObject()["html_url"].toString();
 
-         const auto headObj = pr["head"].toObject();
+            const auto headObj = pr.toObject()["head"].toObject();
 
-         prInfo.state.sha = headObj["sha"].toString();
+            prInfo.state.sha = headObj["sha"].toString();
 
-         mPulls.insert(prInfo.state.sha, prInfo);
+            mPulls.insert(prInfo.state.sha, prInfo);
 
-         auto request = createRequest(mRepoEndpoint + QString("/commits/%1/status").arg(prInfo.state.sha));
-         const auto reply = mManager->get(request);
-         connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestStatusReceived);
+            auto request = createRequest(mRepoEndpoint + QString("/commits/%1/status").arg(prInfo.state.sha));
+            const auto reply = mManager->get(request);
+            connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestStatusReceived);
 
-         ++mPrRequested;
+            ++mPrRequested;
+          }
       }
    }
    else
@@ -306,17 +308,22 @@ void GitHubRestApi::onPullRequestStatusReceived()
 
       for (auto status : statuses)
       {
-         auto statusStr = status["state"].toString();
+          if(status.isObject()) {
+             auto statusStr = status.toObject()["state"].toString();
 
-         if (statusStr == "ok")
-            statusStr = "success";
-         else if (statusStr == "error")
-            statusStr = "failure";
+             if (statusStr == "ok")
+                statusStr = "success";
+             else if (statusStr == "error")
+                statusStr = "failure";
 
-         ServerPullRequest::HeadState::Check check { status["description"].toString(), statusStr,
-                                                     status["target_url"].toString(), status["context"].toString() };
+             ServerPullRequest::HeadState::Check check { status.toObject()["description"].toString(), statusStr,
+                                                         status.toObject()["target_url"].toString(), status.toObject()["context"].toString() };
 
-         mPulls[sha].state.checks.append(check);
+             mPulls[sha].state.checks.append(check);
+          }
+          else {
+              emit errorOccurred("Status found that is not an object");
+          }
       }
 
       --mPrRequested;
